@@ -62,7 +62,7 @@ Default: 10.0.2.0/28
 AccepterRegion:
 Description: enter the region 
 Type: String
-Default: us-east-1a
+Default: us-east-1
 
 AccepterAccountID: 
 Description: enter the accountId 
