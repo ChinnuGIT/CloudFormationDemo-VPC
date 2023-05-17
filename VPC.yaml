@@ -1,6 +1,6 @@
  AWSTemplateFormatVersion: 2010-09-09
 
- Description: "This template create a VPC and private subnet with NAT"
+ Description: This template create a VPC and private subnet with NAT
 
  Parameters:
    VPCName:
