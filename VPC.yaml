@@ -1,190 +1,444 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: Application VPC with public, private, and data subnets
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: "This template create a VPC and private subnet with NAT"
+
+Parameters:
+  VPCName:
+  Description: Enter VPC Name
+  Type: String
+  Default: ManagementVPC
+
+  VPCName1:
+  Description: Enter VPC Name
+  Type: String
+  Default: APPVPC
+
+  VPCName2:
+  Description: Enter VPC Name
+  Type: String
+  Default: DBVPC
+
+  ManagementVPCBlock:
+  Description: Please enter the IP range (CIDR notation) for this VPC
+  Type: String
+  Default: "10.0.0.0/24"
+
+  ManagementPublicSubnet01Block:
+  Description: Please enter the IP range (CIDR notation) for the public subnet 
+  Type: String
+  Default: "10.0.0.0/28"  
+    
+  APPVPCBlock:
+  Description: Please enter the IP range (CIDR notation) for this VPC
+  Type: String
+  Default: 10.0.1.0/24
+
+  APPPrivateSubnet02Block:
+  Description: Please enter the IP range (CIDR notation) for the public subnet
+  Type: String
+  Default: 10.0.1.0/28 
+
+  APPPublicSubnet03Block:
+  Description: Please enter the IP range (CIDR notation) for the public subnet 
+  Type: String
+  Default: 10.0.1.16/28 
+
+  APPPublicSubnet05Block:
+  Description: Please enter the IP range (CIDR notation) for the public subnet 
+  Type: String
+  Default: 10.0.1.32/28
+    
+  DBVPCBlock:
+  Description: Please enter the IP range (CIDR notation) for this VPC
+  Type: String
+  Default: "10.0.2.0/24"
+
+  DBPrivateSubnet04Block:
+  Description: Please enter the IP range (CIDR notation) for the public subnet 
+  Type: String
+  Default: 10.0.2.0/28 
+
 
 Resources:
-  ApplicationVPC:
-    Type: AWS::EC2::VPC
+  ManagementVPC:
+    Type: "AWS::EC2::VPC"
     Properties:
-      CidrBlock: '10.0.0.0/16'
-      EnableDnsSupport: true
-      EnableDnsHostnames: true
-      Tags:
-        - Key: Name
-          Value: ApplicationVPC
-
-  PublicSubnet1:
-    Type: AWS::EC2::Subnet
+    EnableDnsSupport: "true"
+    EnableDnsHostnames: "true"
+    CidrBlock: !Ref ManagementVPCBlock
+    Tags:
+      -
+        Key: "Network"
+        Value: "Public"
+      
+    
+  ManagementPublicSubnet:
+    Type: "AWS::EC2::Subnet"
     Properties:
-      VpcId: !Ref ApplicationVPC
-      CidrBlock: '10.0.1.0/24'
-      AvailabilityZone: 'us-west-2a'
+      VpcId: !Ref "ManagementVPC"
+      AvailabilityZone: "us-east-1a"
+      
+      CidrBlock: !Ref "ManagementPublicSubnet01Block"
+      
+      MapPublicIpOnLaunch: "true"
+      
       Tags:
-        - Key: Name
-          Value: PublicSubnet1
-
-  PublicSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref ApplicationVPC
-      CidrBlock: '10.0.2.0/24'
-      AvailabilityZone: 'us-west-2b'
-      Tags:
-        - Key: Name
-          Value: PublicSubnet2
-
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref ApplicationVPC
-      CidrBlock: '10.0.3.0/24'
-      AvailabilityZone: 'us-west-2a'
-      Tags:
-        - Key: Name
-          Value: PrivateSubnet1
-
-  PrivateSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref ApplicationVPC
-      CidrBlock: '10.0.4.0/24'
-      AvailabilityZone: 'us-west-2b'
-      Tags:
-        - Key: Name
-          Value: PrivateSubnet2
-
-  DataSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref ApplicationVPC
-      CidrBlock: '10.0.5.0/24'
-      AvailabilityZone: 'us-west-2a'
-      Tags:
-        - Key: Name
-          Value: DataSubnet1
-
-  DataSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref ApplicationVPC
-      CidrBlock: '10.0.6.0/24'
-      AvailabilityZone: 'us-west-2b'
-      Tags:
-        - Key: Name
-          Value: DataSubnet2
-
+        -
+          Key: "Network"
+          Value: "Public"
+        -
+          Key: "Name"
+          Value: !Join
+            - '-'
+            - - !Ref "VPCName"
+              - 'public'
+            
   InternetGateway:
-    Type: AWS::EC2::InternetGateway
+    Type: "AWS::EC2::InternetGateway"
     Properties:
       Tags:
-        - Key: Name
-          Value: InternetGateway
+        -
+          Key: "Name"
+          Value: "MYIG"
 
-  VPCGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
+  GatewayToInternet:
+    Type: "AWS::EC2::VPCGatewayAttachment"
     Properties:
-      VpcId: !Ref ApplicationVPC
+      VpcId: !Ref ManagementVPC
       InternetGatewayId: !Ref InternetGateway
 
-  PublicRouteTable1:
-    Type: AWS::EC2::RouteTable
+  ManagementPublicRouteTable:
+    Type: "AWS::EC2::RouteTable"
     Properties:
-      VpcId: !Ref ApplicationVPC
+      VpcId: !Ref "ManagementVPC"
       Tags:
-        - Key: Name
-          Value: PublicRouteTable1
+        -
+          Key: "Network"
+          Value: "ManagementPublicSubnet"
+        -
+          Key: "Name"
+          Value: !Join
+            - '-'
+            - - !Ref "VPCName"
+              - public 
+              - route 
+              - table
 
-  PublicRouteTable2:
-    Type: AWS::EC2::RouteTable
+  PublicRoute:
+    Type: "AWS::EC2::Route"
+    DependsOn: "GatewayToInternet"
     Properties:
-      VpcId: !Ref ApplicationVPC
-      Tags:
-        - Key: Name
-          Value: PublicRouteTable2
+      RouteTableId:
+        Ref: "ManagementPublicRouteTable"
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId:
+        Ref: "InternetGateway"
 
-  PublicRoute1:
+  ManagementPublicSubnetRouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "ManagementPublicSubnet"
+      RouteTableId:
+        Ref: "ManagementPublicRouteTable"
+
+
+  VpcPeeringConnection1:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      PeerOwnerId: !Ref AccepterAccountID
+      PeerRegion: !Ref AccepterRegion 
+      VpcId: !Ref ManagementVPC
+      PeerVpcId: !Ref APPVPC
+
+  PeeringRoute1:
     Type: AWS::EC2::Route
-    DependsOn: VPCGatewayAttachment
     Properties:
-      RouteTableId: !Ref PublicRouteTable1
-      DestinationCidrBlock: '0.0.0.0/0'
-      GatewayId: !Ref InternetGateway
+      DestinationCidrBlock: !Ref APPVPCBlock
+      RouteTableId: !Ref ManagementPublicRouteTable
+      VpcPeeringConnectionId: !Ref 'VpcPeeringConnection1'
 
-  PublicRoute2:
-   Type: AWS::EC2::Route
-   DependsOn: VPCGatewayAttachment
-   Properties:
-     RouteTableId: !Ref PublicRouteTable2
-     DestinationCidrBlock: '0.0.0.0/0'
-     GatewayId: !Ref InternetGateway
 
-  PrivateRouteTable1:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref ApplicationVPC
-      Tags:
-        - Key: Name
-          Value: PrivateRouteTable1
-
-  PrivateRouteTable2:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref ApplicationVPC
-      Tags:
-        - Key: Name
-          Value: PrivateRouteTable2
-
-  PrivateRoute1:
+  PeeringRoute2:
     Type: AWS::EC2::Route
-    DependsOn: VPCGatewayAttachment
     Properties:
-      RouteTableId: !Ref PrivateRouteTable1
-      DestinationCidrBlock: '0.0.0.0/0'
-      NatGatewayId: !Ref NATGateway1
+      DestinationCidrBlock: !Ref ManagementVPCBlock
+      RouteTableId: !Ref PublicRouteTable
+      VpcPeeringConnectionId: !Ref 'VpcPeeringConnection1'
 
-  PrivateRoute2:
+  PeeringRoute3:
     Type: AWS::EC2::Route
-    DependsOn: VPCGatewayAttachment
     Properties:
-      RouteTableId: !Ref PrivateRouteTable2
-      DestinationCidrBlock: '0.0.0.0/0'
-      NatGatewayId: !Ref NATGateway2
+      DestinationCidrBlock: !Ref ManagementVPCBlock
+      RouteTableId: !Ref PrivateRouteTable
+      VpcPeeringConnectionId: !Ref 'VpcPeeringConnection1'
 
-  NATGatewayEIP1:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
 
-  NATGatewayEIP2:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
+        
 
-  NATGateway1:
-    Type: AWS::EC2::NatGateway
+  DBVPC:
+  Type: "AWS::EC2::VPC"
+  Properties:
+    EnableDnsSupport: "true"
+    EnableDnsHostnames: "true"
+    CidrBlock: !Ref "DBVPCBlock"
+    Tags:
+      -
+        Key: "Network"
+        Value: "Private"
+      
+
+  PrivateSubnet2:
+    Type: "AWS::EC2::Subnet"
     Properties:
-      SubnetId: !Ref PublicSubnet1
-      AllocationId: !GetAtt NATGatewayEIP1.AllocationId
+      VpcId:
+        Ref: "DBVPC"
+      AvailabilityZone: us-east-1a
+        
+      CidrBlock: !Ref "DBPrivateSubnet04Block"
       Tags:
-        - Key: Name
-          Value: NATGateway1
+        -
+          Key: "Network"
+          Value: "Private"
+        -
+          Key: "Name"
+          Value: !Join
+            - ''
+            - - !Ref "VPCName2"
+              - '-private-'
 
-  NATGateway2:
-    Type: AWS::EC2::NatGateway
+
+  PrivateRouteTable:
+    Type: "AWS::EC2::RouteTable"
     Properties:
-      SubnetId: !Ref PublicSubnet2
-      AllocationId: !GetAtt NATGatewayEIP2.AllocationId
+      VpcId: !Ref "DBVPC"
       Tags:
-        - Key: Name
-          Value: NATGateway2
+        -
+          Key: "Name"
+          Value: !Join
+            - ''
+            - - !Ref "VPCName1"
+              - '-public-route-table'
 
-  PrivateSubnet1RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PrivateSubnet1
-      RouteTableId: !Ref PrivateRouteTable1
+  APPVPC:
+  Type: "AWS::EC2::VPC"
+  Properties:
+    EnableDnsSupport: "true"
+    EnableDnsHostnames: "true"
+    CidrBlock: !Ref "APPVPCBlock"
+    Tags:
+      -
+        Key: "Network"
+        Value: "Private"
+      
 
-  PrivateSubnet2RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+  PrivateSubnet1:
+    Type: "AWS::EC2::Subnet"
     Properties:
-      SubnetId: !Ref PrivateSubnet2
-      RouteTableId: !Ref PrivateRouteTable2
+      VpcId:
+        Ref: "APPVPC"
+      AvailabilityZone: us-east-1a
+        
+      CidrBlock: !Ref "APPPrivateSubnet02Block"
+      Tags:
+        -
+          Key: "Network"
+          Value: "Private"
+        -
+          Key: "Name"
+          Value: !Join
+            - '-'
+            - - !Ref "VPCName1"
+              - 'private'
+  
+  PublicSubnet1:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref "APPVPC"
+      AvailabilityZone: "us-east-1a"
+      
+      CidrBlock: !Ref "APPPublicSubnet03Block"
+      
+      MapPublicIpOnLaunch: "true"
+      
+      Tags:
+        -
+          Key: "Network"
+          Value: "Public"
+        -
+          Key: "Name"
+          Value: !Join
+            - '-'
+            - - !Ref "VPCName1"
+              - public
+
+  PublicSubnet2:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      VpcId: !Ref "APPVPC"
+      AvailabilityZone: "us-east-1b"
+      
+      CidrBlock: !Ref "APPPublicSubnet05Block"
+      
+      MapPublicIpOnLaunch: "true"
+      
+      Tags:
+        -
+          Key: "Network"
+          Value: "Public"
+        -
+          Key: "Name"
+          Value: !Join
+            - '-'
+            - - !Ref "VPCName1"
+              - public
+            
+  InternetGateway:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+      -
+        Key: "Name"
+        Value: "IG"
+
+  GatewayToInternet:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      VpcId: !Ref APPVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref "APPVPC"
+      Tags:
+        -
+          Key: "Name"
+          Value: !Join
+            - ''
+            - - !Ref "VPCName1"
+              - '-public-route-table'
+
+  PublicRoute:
+    Type: "AWS::EC2::Route"
+    DependsOn: "GatewayToInternet"
+    Properties:
+      RouteTableId:
+        Ref: "PublicRouteTable"
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId:
+        Ref: "InternetGateway"
+
+  PublicSubnetRouteTableAssociation1:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PublicSubnet1"
+      RouteTableId:
+        Ref: "PublicRouteTable"
+  
+  PublicSubnetRouteTableAssociation2:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PublicSubnet2"
+      RouteTableId:
+        Ref: "PublicRouteTable"
+
+  ElasticIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: "APPvpc"
+
+  NATGateway:
+    Type: "AWS::EC2::NatGateway"
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - "ElasticIP"
+          - "AllocationId"
+      SubnetId:
+        Ref: "PublicSubnet1"
+
+  PrivateRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId:
+        Ref: "APPVPC"
+      Tags:
+        -
+          Key: "Name"
+          Value: !Join
+            - ''
+            - - !Ref "VPCName1"
+              - '-private-route-table'
+
+  PrivateRouteToInternet:
+    Type: "AWS::EC2::Route"
+    Properties:
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId:
+        Ref: "NATGateway"
+
+  PrivateSubnetRouteTableAssociation:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: "PrivateSubnet1"
+      RouteTableId:
+        Ref: "PrivateRouteTable"
+
+
+  VpcPeeringConnection2:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      PeerOwnerId: !Ref AccepterAccountID
+      PeerRegion: !Ref AccepterRegion 
+      VpcId: !Ref APPVPC
+      PeerVpcId: !Ref DBVPC
+
+  PeeringRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: !Ref DBVPCBlock
+      RouteTableId: !Ref PublicRouteTable
+      VpcPeeringConnectionId: !Ref 'VpcPeeringConnection2'
+
+  PeeringRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: !Ref APPVPCBlock
+      RouteTableId: !Ref PrivateRouteTable
+      VpcPeeringConnectionId: !Ref 'VpcPeeringConnection2'
+
+            
+Outputs:
+
+
+  VpcId:
+    Value: !Ref ManagementVPC
+
+  PublicSubnetId:
+    Value: !Ref ManagementPublicSubnet
+
+  Vpc1Id:
+    Value: !Ref APPVPC
+
+  PrivateSubnetId:
+    Value: !Ref PrivateSubnet1
+
+  PublicSubnet1Id:
+    Value: !Ref PublicSubnet1
+
+  PublicSubnet2Id:
+    Value: !Ref PublicSubnet2
+
+  Vpc2Id:
+    Value: !Ref DBVPC
+
+  PrivateSubnet2Id:
+    Value: !Ref PrivateSubnet2
+
+      
