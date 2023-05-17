@@ -13,11 +13,6 @@
     Type: String
     Default: APPVPC
 
-   VPCName2:
-    Description: Enter VPC Name
-    Type: String
-    Default: DBVPC
-
    ManagementVPCBlock:
     Description: Please enter the IP range (CIDR notation) for this VPC
     Type: String
@@ -27,14 +22,14 @@
     Description: Please enter the IP range (CIDR notation) for the public subnet 
     Type: String
     Default: "10.0.0.0/28"  
-      
+   
    APPVPCBlock:
     Description: Please enter the IP range (CIDR notation) for this VPC
     Type: String
     Default: 10.0.1.0/24
 
    APPPrivateSubnet02Block:
-    Description: Please enter the IP range (CIDR notation) for the public subnet
+    Description: Please enter the IP range (CIDR notation) for the private subnet
     Type: String
     Default: 10.0.1.0/28 
 
@@ -42,32 +37,16 @@
     Description: Please enter the IP range (CIDR notation) for the public subnet 
     Type: String
     Default: 10.0.1.16/28 
-
-   APPPublicSubnet05Block:
-    Description: Please enter the IP range (CIDR notation) for the public subnet 
-    Type: String
-    Default: 10.0.1.32/28
-      
-   DBVPCBlock:
-    Description: Please enter the IP range (CIDR notation) for this VPC
-    Type: String
-    Default: "10.0.2.0/24"
-
-   DBPrivateSubnet04Block:
-    Description: Please enter the IP range (CIDR notation) for the public subnet 
-    Type: String
-    Default: 10.0.2.0/28 
-
+ 
 
    AccepterRegion:
     Description: enter the region 
     Type: String
-    Default: us-east-1a
+
 
    AccepterAccountID: 
     Description: enter the accountId 
     Type: String
-    Default: 842934422847
 
 
  Resources:
@@ -154,7 +133,7 @@
           Ref: "ManagementPublicRouteTable"
 
 
-   VpcPeeringConnection1:
+   VpcPeeringConnection:
       Type: AWS::EC2::VPCPeeringConnection
       Properties:
         PeerOwnerId: !Ref AccepterAccountID
@@ -162,12 +141,13 @@
         VpcId: !Ref ManagementVPC
         PeerVpcId: !Ref APPVPC
 
+
    PeeringRoute1:
       Type: AWS::EC2::Route
       Properties:
         DestinationCidrBlock: !Ref APPVPCBlock
         RouteTableId: !Ref ManagementPublicRouteTable
-        VpcPeeringConnectionId: !Ref 'VpcPeeringConnection1'
+        VpcPeeringConnectionId: !Ref 'VpcPeeringConnection'
 
 
    PeeringRoute2:
@@ -175,61 +155,16 @@
       Properties:
         DestinationCidrBlock: !Ref ManagementVPCBlock
         RouteTableId: !Ref PublicRouteTable
-        VpcPeeringConnectionId: !Ref 'VpcPeeringConnection1'
+        VpcPeeringConnectionId: !Ref 'VpcPeeringConnection'
 
+   
    PeeringRoute3:
       Type: AWS::EC2::Route
       Properties:
         DestinationCidrBlock: !Ref ManagementVPCBlock
         RouteTableId: !Ref PrivateRouteTable
-        VpcPeeringConnectionId: !Ref 'VpcPeeringConnection1'
+        VpcPeeringConnectionId: !Ref 'VpcPeeringConnection'
 
-
-          
-
-   DBVPC:
-    Type: "AWS::EC2::VPC"
-    Properties:
-      EnableDnsSupport: "true"
-      EnableDnsHostnames: "true"
-      CidrBlock: !Ref "DBVPCBlock"
-      Tags:
-        -
-          Key: "Network"
-          Value: "Private"
-        
-
-   PrivateSubnet2:
-      Type: "AWS::EC2::Subnet"
-      Properties:
-        VpcId:
-          Ref: "DBVPC"
-        AvailabilityZone: us-east-1a
-          
-        CidrBlock: !Ref "DBPrivateSubnet04Block"
-        Tags:
-          -
-            Key: "Network"
-            Value: "Private"
-          -
-            Key: "Name"
-            Value: !Join
-              - ''
-              - - !Ref "VPCName2"
-                - '-private-'
-
-
-   PrivateRouteTable:
-      Type: "AWS::EC2::RouteTable"
-      Properties:
-        VpcId: !Ref "DBVPC"
-        Tags:
-          -
-            Key: "Name"
-            Value: !Join
-              - ''
-              - - !Ref "VPCName1"
-                - '-public-route-table'
 
    APPVPC:
     Type: "AWS::EC2::VPC"
@@ -283,26 +218,6 @@
              - - !Ref "VPCName1"
                - public
 
-   PublicSubnet2:
-     Type: "AWS::EC2::Subnet"
-     Properties:
-       VpcId: !Ref "APPVPC"
-       AvailabilityZone: "us-east-1b"
-       
-       CidrBlock: !Ref "APPPublicSubnet05Block"
-       
-       MapPublicIpOnLaunch: "true"
-        
-       Tags:
-         -
-           Key: "Network"
-           Value: "Public"
-         -
-           Key: "Name"
-           Value: !Join
-             - '-'
-             - - !Ref "VPCName1"
-               - public
               
    InternetGateway:
      Type: "AWS::EC2::InternetGateway"
@@ -347,19 +262,11 @@
           Ref: "PublicSubnet1"
         RouteTableId:
           Ref: "PublicRouteTable"
-   
-   PublicSubnetRouteTableAssociation2:
-      Type: "AWS::EC2::SubnetRouteTableAssociation"
-      Properties:
-        SubnetId:
-          Ref: "PublicSubnet2"
-        RouteTableId:
-          Ref: "PublicRouteTable"
 
    ElasticIP:
       Type: "AWS::EC2::EIP"
       Properties:
-        Domain: "APPvpc"
+        Domain: "APPVPC"
 
    NATGateway:
       Type: "AWS::EC2::NatGateway"
@@ -402,28 +309,7 @@
           Ref: "PrivateRouteTable"
 
 
-   VpcPeeringConnection2:
-      Type: AWS::EC2::VPCPeeringConnection
-      Properties:
-        PeerOwnerId: !Ref AccepterAccountID
-        PeerRegion: !Ref AccepterRegion 
-        VpcId: !Ref APPVPC
-        PeerVpcId: !Ref DBVPC
-
-   PeeringRoute:
-      Type: AWS::EC2::Route
-      Properties:
-        DestinationCidrBlock: !Ref DBVPCBlock
-        RouteTableId: !Ref PublicRouteTable
-        VpcPeeringConnectionId: !Ref 'VpcPeeringConnection2'
-
-   PeeringRoute:
-      Type: AWS::EC2::Route
-      Properties:
-        DestinationCidrBlock: !Ref APPVPCBlock
-        RouteTableId: !Ref PrivateRouteTable
-        VpcPeeringConnectionId: !Ref 'VpcPeeringConnection2'
-
+   
               
  Outputs:
 
@@ -434,6 +320,9 @@
     PublicSubnetId:
       Value: !Ref ManagementPublicSubnet
 
+    PrivateSubnetId:
+      Value: !Ref ManagementPrivateSubnet
+
     Vpc1Id:
       Value: !Ref APPVPC
 
@@ -442,12 +331,3 @@
 
     PublicSubnet1Id:
       Value: !Ref PublicSubnet1
-
-    PublicSubnet2Id:
-      Value: !Ref PublicSubnet2
-
-    Vpc2Id:
-      Value: !Ref DBVPC
-
-    PrivateSubnet2Id:
-      Value: !Ref PrivateSubnet2
