@@ -36,17 +36,17 @@ Parameters:
   APPPrivateSubnet02Block:
    Description: Please enter the IP range (CIDR notation) for the public subnet
    Type: String
-   Default: 10.0.1.0/28 
+   Default: 10.0.3.0/28 
 
   APPPublicSubnet03Block:
    Description: Please enter the IP range (CIDR notation) for the public subnet 
    Type: String
-   Default: 10.0.1.16/28 
+   Default: 10.0.3.16/28 
 
   APPPublicSubnet05Block:
    Description: Please enter the IP range (CIDR notation) for the public subnet 
    Type: String
-   Default: 10.0.1.32/28
+   Default: 10.0.3.32/28
     
   DBVPCBlock:
    Description: Please enter the IP range (CIDR notation) for this VPC
