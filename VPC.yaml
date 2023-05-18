@@ -61,7 +61,7 @@ Parameters:
   AccepterRegion:
     Description: enter the region 
     Type: String
-    Default: us-east-1
+    Default: us-east-2
 
 
   AccepterAccountID: 
@@ -88,7 +88,7 @@ Resources:
     Type: "AWS::EC2::Subnet"
     Properties:
       VpcId: !Ref "ManagementVPC"
-      AvailabilityZone: "us-east-1a"
+      AvailabilityZone: "us-east-2a"
       
       CidrBlock: !Ref "ManagementPublicSubnet01Block"
       
@@ -203,7 +203,7 @@ Resources:
     Properties:
       VpcId:
         Ref: "DBVPC"
-      AvailabilityZone: us-east-1a
+      AvailabilityZone: us-east-2a
         
       CidrBlock: !Ref "DBPrivateSubnet04Block"
       Tags:
@@ -247,7 +247,7 @@ Resources:
     Properties:
       VpcId:
         Ref: "APPVPC"
-      AvailabilityZone: us-east-1a
+      AvailabilityZone: us-east-2a
         
       CidrBlock: !Ref "APPPrivateSubnet02Block"
       Tags:
@@ -265,7 +265,7 @@ Resources:
     Type: "AWS::EC2::Subnet"
     Properties:
       VpcId: !Ref "APPVPC"
-      AvailabilityZone: "us-east-1a"
+      AvailabilityZone: "us-east-2a"
       
       CidrBlock: !Ref "APPPublicSubnet03Block"
       
@@ -286,7 +286,7 @@ Resources:
     Type: "AWS::EC2::Subnet"
     Properties:
       VpcId: !Ref "APPVPC"
-      AvailabilityZone: "us-east-1b"
+      AvailabilityZone: "us-east-2b"
       
       CidrBlock: !Ref "APPPublicSubnet05Block"
       
