@@ -64,7 +64,7 @@ Parameters:
     Default: us-east-1
 
 
-   AccepterAccountID: 
+  AccepterAccountID: 
     Description: enter the accountId 
     Type: String
     Default: 842934422847
