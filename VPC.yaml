@@ -169,8 +169,8 @@ Resources:
 
 
   APPVPC:
-  Type: "AWS::EC2::VPC"
-  Properties:
+   Type: "AWS::EC2::VPC"
+   Properties:
     EnableDnsSupport: "true"
     EnableDnsHostnames: "true"
     CidrBlock: !Ref "APPVPCBlock"
