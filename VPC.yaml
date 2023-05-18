@@ -59,12 +59,12 @@ Parameters:
    Default: 10.0.2.0/28 
 
 
-  AccepterRegion:
+  RequesterRegion:
    Description: enter the region 
    Type: String
    Default: us-east-1
 
-  AccepterAccountID: 
+  RequesterAccountID: 
    Description: enter the accountId 
    Type: String
    Default: 842934422847
@@ -157,8 +157,8 @@ Resources:
   VpcPeeringConnection1:
     Type: AWS::EC2::VPCPeeringConnection
     Properties:
-      PeerOwnerId: !Ref AccepterAccountID
-      PeerRegion: !Ref AccepterRegion 
+      PeerOwnerId: !Ref RequesterAccountID
+      PeerRegion: !Ref RequesterRegion 
       VpcId: !Ref ManagementVPC
       PeerVpcId: !Ref APPVPC
 
@@ -405,8 +405,8 @@ Resources:
   VpcPeeringConnection2:
     Type: AWS::EC2::VPCPeeringConnection
     Properties:
-      PeerOwnerId: !Ref AccepterAccountID
-      PeerRegion: !Ref AccepterRegion 
+      PeerOwnerId: !Ref RequesterAccountID
+      PeerRegion: !Ref RequesterRegion 
       VpcId: !Ref APPVPC
       PeerVpcId: !Ref DBVPC
 
