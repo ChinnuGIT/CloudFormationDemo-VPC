@@ -4,59 +4,59 @@ Description: "This template create a VPC and private subnet with NAT"
 
 Parameters:
   VPCName:
-  Description: Enter VPC Name
-  Type: String
-  Default: ManagementVPC
+   Description: Enter VPC Name
+   Type: String
+   Default: ManagementVPC
 
   VPCName1:
-  Description: Enter VPC Name
-  Type: String
-  Default: APPVPC
+   Description: Enter VPC Name
+   Type: String
+   Default: APPVPC
 
   VPCName2:
-  Description: Enter VPC Name
-  Type: String
-  Default: DBVPC
+   Description: Enter VPC Name
+   Type: String
+   Default: DBVPC
 
   ManagementVPCBlock:
-  Description: Please enter the IP range (CIDR notation) for this VPC
-  Type: String
-  Default: "10.0.0.0/24"
+   Description: Please enter the IP range (CIDR notation) for this VPC
+   Type: String
+   Default: "10.0.0.0/24"
 
   ManagementPublicSubnet01Block:
-  Description: Please enter the IP range (CIDR notation) for the public subnet 
-  Type: String
-  Default: "10.0.0.0/28"  
+   Description: Please enter the IP range (CIDR notation) for the public subnet 
+   Type: String
+   Default: "10.0.0.0/28"  
     
   APPVPCBlock:
-  Description: Please enter the IP range (CIDR notation) for this VPC
-  Type: String
-  Default: 10.0.1.0/24
+   Description: Please enter the IP range (CIDR notation) for this VPC
+   Type: String
+   Default: 10.0.1.0/24
 
   APPPrivateSubnet02Block:
-  Description: Please enter the IP range (CIDR notation) for the public subnet
-  Type: String
-  Default: 10.0.1.0/28 
+   Description: Please enter the IP range (CIDR notation) for the public subnet
+   Type: String
+   Default: 10.0.1.0/28 
 
   APPPublicSubnet03Block:
-  Description: Please enter the IP range (CIDR notation) for the public subnet 
-  Type: String
-  Default: 10.0.1.16/28 
+   Description: Please enter the IP range (CIDR notation) for the public subnet 
+   Type: String
+   Default: 10.0.1.16/28 
 
   APPPublicSubnet05Block:
-  Description: Please enter the IP range (CIDR notation) for the public subnet 
-  Type: String
-  Default: 10.0.1.32/28
+   Description: Please enter the IP range (CIDR notation) for the public subnet 
+   Type: String
+   Default: 10.0.1.32/28
     
   DBVPCBlock:
-  Description: Please enter the IP range (CIDR notation) for this VPC
-  Type: String
-  Default: "10.0.2.0/24"
+   Description: Please enter the IP range (CIDR notation) for this VPC
+   Type: String
+   Default: "10.0.2.0/24"
 
   DBPrivateSubnet04Block:
-  Description: Please enter the IP range (CIDR notation) for the public subnet 
-  Type: String
-  Default: 10.0.2.0/28 
+   Description: Please enter the IP range (CIDR notation) for the public subnet 
+   Type: String
+   Default: 10.0.2.0/28 
 
 
 Resources:
@@ -442,3 +442,6 @@ Outputs:
     Value: !Ref PrivateSubnet2
 
       
+
+
+
