@@ -31,7 +31,7 @@ Parameters:
   APPVPCBlock:
    Description: Please enter the IP range (CIDR notation) for this VPC
    Type: String
-   Default: 10.0.1.0/24
+   Default: 10.0.3.0/24
 
   APPPrivateSubnet02Block:
    Description: Please enter the IP range (CIDR notation) for the public subnet
