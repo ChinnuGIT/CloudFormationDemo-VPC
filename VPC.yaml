@@ -175,8 +175,8 @@ Resources:
 
 
   DBVPC:
-  Type: "AWS::EC2::VPC"
-  Properties:
+   Type: "AWS::EC2::VPC"
+   Properties:
     EnableDnsSupport: "true"
     EnableDnsHostnames: "true"
     CidrBlock: !Ref "DBVPCBlock"
@@ -219,8 +219,8 @@ Resources:
               - '-public-route-table'
 
   APPVPC:
-  Type: "AWS::EC2::VPC"
-  Properties:
+   Type: "AWS::EC2::VPC"
+   Properties:
     EnableDnsSupport: "true"
     EnableDnsHostnames: "true"
     CidrBlock: !Ref "APPVPCBlock"
