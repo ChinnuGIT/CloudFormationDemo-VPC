@@ -63,10 +63,10 @@ Resources:
   ManagementVPC:
     Type: "AWS::EC2::VPC"
     Properties:
-    EnableDnsSupport: "true"
-    EnableDnsHostnames: "true"
-    CidrBlock: !Ref ManagementVPCBlock
-    Tags:
+     EnableDnsSupport: "true"
+     EnableDnsHostnames: "true"
+     CidrBlock: !Ref ManagementVPCBlock
+     Tags:
       -
         Key: "Network"
         Value: "Public"
