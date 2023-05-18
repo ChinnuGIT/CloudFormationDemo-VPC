@@ -61,7 +61,7 @@ Parameters:
   AccepterRegion:
     Description: enter the region 
     Type: String
-    Default: us-east-1
+    Default: us-east-1a
 
 
   AccepterAccountID: 
